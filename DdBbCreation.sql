@@ -1085,3 +1085,12 @@ CREATE UNIQUE INDEX user_video_rips_lang_unique
                         rip_style_id,
                         origin_language_id,
                         target_language_id);
+
+-- 1. Add the new processed column (defaulting to FALSE)
+ALTER TABLE user_video_rips
+    ADD COLUMN processed BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- 2b. (Recommended) A *partial* index for faster “unprocessed” lookups
+CREATE INDEX idx_user_video_rips_unprocessed
+    ON user_video_rips(external_video_id, rip_style_id)
+    WHERE processed = FALSE;
