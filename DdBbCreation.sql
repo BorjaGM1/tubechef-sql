@@ -1053,3 +1053,35 @@ ALTER TABLE user_channel_rips
         FOREIGN KEY (target_language_id)
             REFERENCES languages(id)
             ON DELETE SET NULL;
+
+
+CREATE UNIQUE INDEX user_channel_rips_lang_unique
+    ON user_channel_rips (user_id,
+                          channel_id,
+                          rip_style_id,
+                          origin_language_id,
+                          target_language_id);
+
+/* 1. Add the columns — NULL‑able by default */
+ALTER TABLE user_video_rips
+    ADD COLUMN origin_language_id INTEGER,
+    ADD COLUMN target_language_id INTEGER;
+
+/* 2. Foreign‑key constraints with ON DELETE SET NULL */
+ALTER TABLE user_video_rips
+    ADD CONSTRAINT user_video_rips_origin_language_fkey
+        FOREIGN KEY (origin_language_id)
+            REFERENCES languages(id)
+            ON DELETE SET NULL,
+    ADD CONSTRAINT user_video_rips_target_language_fkey
+        FOREIGN KEY (target_language_id)
+            REFERENCES languages(id)
+            ON DELETE SET NULL;
+
+/* 3. Uniqueness rule that kicks in only when languages are present */
+CREATE UNIQUE INDEX user_video_rips_lang_unique
+    ON user_video_rips (user_id,
+                        external_video_id,
+                        rip_style_id,
+                        origin_language_id,
+                        target_language_id);
