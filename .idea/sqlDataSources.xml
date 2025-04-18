@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="04df63de-8136-4758-9e4b-3eeee07be288" name="postgres@supabase Mapping">
+      <data-sources db="5639e82b-238d-4bbf-a7ae-dd7bf96324d9" />
+      <scope>
+        <node kind="database" negative="1" />
+      </scope>
+    </mapping>
+  </component>
+</project>
