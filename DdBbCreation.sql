@@ -1094,3 +1094,31 @@ ALTER TABLE user_video_rips
 CREATE INDEX idx_user_video_rips_unprocessed
     ON user_video_rips(external_video_id, rip_style_id)
     WHERE processed = FALSE;
+
+-- Add per-user seat limit
+ALTER TABLE users
+    ADD COLUMN license_limit INTEGER NOT NULL DEFAULT 0;
+
+-- Extend api_keys to track active flag and device binding
+ALTER TABLE api_keys
+    ADD COLUMN is_active         BOOLEAN         NOT NULL DEFAULT TRUE,
+    ADD COLUMN device_id        UUID,
+    ADD COLUMN device_registered TIMESTAMPTZ;
+
+-- Ensure each key binds to at most one device (partial unique index)
+CREATE UNIQUE INDEX single_device_per_key
+    ON api_keys(api_key_id, device_id)
+    WHERE device_id IS NOT NULL;
+
+CREATE TABLE logs (
+                      id        BIGSERIAL      PRIMARY KEY,
+                      ts        TIMESTAMPTZ    NOT NULL DEFAULT now(),
+                      user_id   UUID           NOT NULL,
+                      level     TEXT           NOT NULL,
+                      message   JSONB          NOT NULL
+);
+
+-- Indexes for fast queries:
+CREATE INDEX ON logs (ts DESC);
+CREATE INDEX ON logs (user_id, ts DESC);
+CREATE INDEX ON logs USING GIN (message);
