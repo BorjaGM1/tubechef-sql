@@ -1113,12 +1113,21 @@ CREATE UNIQUE INDEX single_device_per_key
 CREATE TABLE logs (
                       id        BIGSERIAL      PRIMARY KEY,
                       ts        TIMESTAMPTZ    NOT NULL DEFAULT now(),
-                      user_id   UUID           NOT NULL,
+                      user_id   INTEGER                   NOT NULL
+                          REFERENCES users(user_id)
+                              ON UPDATE CASCADE
+                              ON DELETE RESTRICT,
                       level     TEXT           NOT NULL,
                       message   JSONB          NOT NULL
 );
 
--- Indexes for fast queries:
-CREATE INDEX ON logs (ts DESC);
-CREATE INDEX ON logs (user_id, ts DESC);
-CREATE INDEX ON logs USING GIN (message);
+-- 3) Indexes for fast querying
+CREATE INDEX idx_logs_ts_desc
+    ON logs (ts DESC);
+
+CREATE INDEX idx_logs_user_ts_desc
+    ON logs (user_id, ts DESC);
+
+CREATE INDEX idx_logs_message_gin
+    ON logs
+        USING GIN (message);
