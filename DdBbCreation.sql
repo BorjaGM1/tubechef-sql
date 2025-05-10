@@ -1131,3 +1131,56 @@ CREATE INDEX idx_logs_user_ts_desc
 CREATE INDEX idx_logs_message_gin
     ON logs
         USING GIN (message);
+
+CREATE TABLE discord_generations (
+                                     generation_id    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                                     username         CITEXT        NOT NULL,
+                                     generation_type  CITEXT        NOT NULL,  -- now case-insensitive too
+                                     message          TEXT          NOT NULL,
+                                     created_at       TIMESTAMPTZ   NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_discord_generations_username
+    ON discord_generations(username);
+
+CREATE INDEX idx_discord_generations_type
+    ON discord_generations(generation_type);
+
+/* ==========================================================
+   Script-profile history
+   ----------------------------------------------------------
+   • One row per version of a user’s “script profile”
+   • FK links: users ▸ project_channel ▸ statuses
+   ==========================================================*/
+
+-- 1. Table
+CREATE TABLE script_profile_history (
+                                        script_profile_history_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                                        user_id        INTEGER      NOT NULL,
+                                        channel_id     INTEGER      NOT NULL,
+                                        title          VARCHAR(255) NOT NULL,
+                                        json_text      JSONB        NOT NULL,
+                                        status_id      SMALLINT     NOT NULL,
+                                        created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+                                        updated_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+
+                                        FOREIGN KEY (user_id)    REFERENCES users(user_id),
+                                        FOREIGN KEY (channel_id) REFERENCES project_channel(channel_id),
+                                        FOREIGN KEY (status_id)  REFERENCES statuses(status_id)
+);
+
+-- 2. Helpful indexes on the FKs
+CREATE INDEX idx_script_profile_history_user_id
+    ON script_profile_history(user_id);
+
+CREATE INDEX idx_script_profile_history_channel_id
+    ON script_profile_history(channel_id);
+
+CREATE INDEX idx_script_profile_history_status_id
+    ON script_profile_history(status_id);
+
+-- 3. Touch updated_at on every UPDATE
+CREATE TRIGGER update_script_profile_history_updated_at
+    BEFORE UPDATE ON script_profile_history
+    FOR EACH ROW
+EXECUTE PROCEDURE update_updated_at_column();
