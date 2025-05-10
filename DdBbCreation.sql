@@ -1162,7 +1162,6 @@ CREATE TABLE script_profile_history (
                                         json_text      JSONB        NOT NULL,
                                         status_id      SMALLINT     NOT NULL,
                                         created_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-                                        updated_at     TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
 
                                         FOREIGN KEY (user_id)    REFERENCES users(user_id),
                                         FOREIGN KEY (channel_id) REFERENCES project_channel(channel_id),
@@ -1178,9 +1177,3 @@ CREATE INDEX idx_script_profile_history_channel_id
 
 CREATE INDEX idx_script_profile_history_status_id
     ON script_profile_history(status_id);
-
--- 3. Touch updated_at on every UPDATE
-CREATE TRIGGER update_script_profile_history_updated_at
-    BEFORE UPDATE ON script_profile_history
-    FOR EACH ROW
-EXECUTE PROCEDURE update_updated_at_column();
