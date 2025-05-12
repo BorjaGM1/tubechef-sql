@@ -1177,3 +1177,51 @@ CREATE INDEX idx_script_profile_history_channel_id
 
 CREATE INDEX idx_script_profile_history_status_id
     ON script_profile_history(status_id);
+
+
+/* ==========================================================
+   1.  Lookup table – third-party services
+   ==========================================================*/
+CREATE TABLE services (
+                          service_id  SMALLINT     GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                          name        VARCHAR(100)  NOT NULL UNIQUE,
+                          description TEXT
+);
+
+-- Seed: first service = “Minimax”
+INSERT INTO services (service_id, name, description)
+    OVERRIDING SYSTEM VALUE
+VALUES (1, 'Minimax', 'Minimax external AI service');
+
+/* ==========================================================
+   2.  Per-user API keys for those services
+   ==========================================================*/
+CREATE TABLE service_api_keys (
+                                  service_api_key_id INTEGER      GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                                  user_id     INTEGER      NOT NULL,
+                                  service_id  SMALLINT     NOT NULL,
+                                  api_key     TEXT         NOT NULL,
+                                  display_name VARCHAR(255),
+
+                                  created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+                                  updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+
+                                  FOREIGN KEY (user_id)    REFERENCES users(user_id),
+                                  FOREIGN KEY (service_id) REFERENCES services(service_id)
+);
+
+-- Helpful FK indexes
+CREATE INDEX idx_service_api_keys_user_id
+    ON service_api_keys(user_id);
+
+CREATE INDEX idx_service_api_keys_service_id
+    ON service_api_keys(service_id);
+
+-- auto-touch updated_at
+CREATE TRIGGER update_service_api_keys_updated_at
+    BEFORE UPDATE ON service_api_keys
+    FOR EACH ROW
+EXECUTE PROCEDURE update_updated_at_column();
+
+ALTER TABLE service_api_keys
+    ADD COLUMN minimax_group_id VARCHAR(255);
