@@ -1225,3 +1225,29 @@ EXECUTE PROCEDURE update_updated_at_column();
 
 ALTER TABLE service_api_keys
     ADD COLUMN minimax_group_id VARCHAR(255);
+
+CREATE TABLE background_tasks (
+                                  task_id              SERIAL PRIMARY KEY,
+                                  queue_id             INTEGER     NOT NULL REFERENCES queue(queue_id),
+                                  task_type            VARCHAR(100) NOT NULL,
+                                  data                 JSONB        NOT NULL,
+
+                                  status_id            SMALLINT     NOT NULL DEFAULT 1
+                                      REFERENCES statuses(status_id),
+
+                                  attempts             INT          NOT NULL DEFAULT 0,
+                                  created_at           TIMESTAMPTZ  NOT NULL DEFAULT (NOW() AT TIME ZONE 'UTC'),
+                                  updated_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW(),          -- ★ NEW
+                                  last_attempted_at    TIMESTAMPTZ,
+                                  completed_at         TIMESTAMPTZ,
+                                  error_message        TEXT,
+                                  lock_id              UUID,
+                                  lock_acquired_at     TIMESTAMPTZ,
+                                  locked_by_worker_id  VARCHAR(255)
+);
+
+-- Auto-touch updated_at on UPDATE
+CREATE TRIGGER update_background_tasks_updated_at
+    BEFORE UPDATE ON background_tasks
+    FOR EACH ROW
+EXECUTE PROCEDURE update_updated_at_column();
