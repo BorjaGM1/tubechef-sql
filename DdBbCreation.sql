@@ -1251,3 +1251,6 @@ CREATE TRIGGER update_background_tasks_updated_at
     BEFORE UPDATE ON background_tasks
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
+
+INSERT INTO asset_types (name, description) VALUES ('sequence_image', 'Sequence images');
+INSERT INTO asset_types (name, description) VALUES ('sequence_video', 'Sequence video');
