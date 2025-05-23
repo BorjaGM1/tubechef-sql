@@ -1254,3 +1254,9 @@ EXECUTE PROCEDURE update_updated_at_column();
 
 INSERT INTO asset_types (name, description) VALUES ('sequence_image', 'Sequence images');
 INSERT INTO asset_types (name, description) VALUES ('sequence_video', 'Sequence video');
+
+ALTER TABLE users
+    ADD COLUMN is_elevate         BOOLEAN         NOT NULL DEFAULT FALSE;
+
+ALTER TABLE users
+    ADD COLUMN is_lifetime         BOOLEAN         NOT NULL DEFAULT FALSE;
