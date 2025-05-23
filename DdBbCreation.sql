@@ -1260,3 +1260,56 @@ ALTER TABLE users
 
 ALTER TABLE users
     ADD COLUMN is_lifetime         BOOLEAN         NOT NULL DEFAULT FALSE;
+
+ALTER TABLE suscriptions
+    ADD COLUMN tokens INTEGER         NOT NULL DEFAULT 0;
+
+INSERT INTO roles (role_id, name, description) VALUES(4, 'Basic', 'Basic sub');
+INSERT INTO roles (role_id, name, description) VALUES(5, 'Pro', 'Pro sub');
+INSERT INTO roles (role_id, name, description) VALUES(6, 'VIP', 'VIP sub');
+INSERT INTO roles (role_id, name, description) VALUES(7, 'Lifetime', 'Lifetime');
+
+------------------------------------- SUBS NORMALES -------------------------------------
+
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Basic', 'Basic Sub', 1.00, true, 0, false, 'prod_SMg1Pql6hgr2Yf');
+
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Mid', 'Mid Sub', 2.00, true, 0, false, 'prod_SMg1Pql6hgr2Yf');
+
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Premium', 'Premium Sub', 4.00, true, 0, false, 'prod_SMg1Pql6hgr2Yf');
+
+-----------------------------------------------------------------------------------------
+
+------------------------------------- SUBS ELEVATE -------------------------------------
+
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Elevate Premium Sub', 'Elevate Premium Sub', 4.00, true, 0, false, 'prod_SMg1Pql6hgr2Yf');
+
+-----------------------------------------------------------------------------------------
+
+------------------------------------- REFILLS -------------------------------------
+-- TIERS --
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Basic Refill', 'Basic Refill', 1.00, true, 0, true, 'prod_SMg1Pql6hgr2Yf');
+
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Mid Refill', 'Mid Refill', 2.00, true, 0, true, 'prod_SMg1Pql6hgr2Yf');
+
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Premium Refill', 'Premium Refill', 4.00, true, 0, true, 'prod_SMg1Pql6hgr2Yf');
+-----------
+
+-- Elevate --
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Elevate Premium Refill', 'Elevate Premium Refill', 4.00, true, 0, true, 'prod_SMg1Pql6hgr2Yf');
+
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Elevate Premium Refill', 'Elevate Premium Refill', 4.00, true, 0, true, 'prod_SMg1Pql6hgr2Yf');
+-----------
+
+-- Lifetime --
+INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
+VALUES ('Lifetime Refill', 'Lifetime Refill', 4.00, true, 0, true, 'prod_SMg1Pql6hgr2Yf');
+-----------
