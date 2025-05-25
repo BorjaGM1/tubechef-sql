@@ -1313,3 +1313,9 @@ VALUES ('Elevate Premium Refill', 'Elevate Premium Refill', 4.00, true, 0, true,
 INSERT INTO suscriptions (name, description, price, active, show_order, is_one_time, product_id)
 VALUES ('Lifetime Refill', 'Lifetime Refill', 4.00, true, 0, true, 'prod_SMg1Pql6hgr2Yf');
 -----------
+
+-- Add Rewardful/affiliate tracking columns to users
+ALTER TABLE users
+    ADD COLUMN affiliate_id            VARCHAR(50),          -- Rewardful affiliate ID
+    ADD COLUMN rewardful_referral_id   VARCHAR(50),          -- Visitor-level UUID from Rewardful
+    ADD COLUMN referral_captured_at    TIMESTAMP;            -- First time we stored the referral ID
