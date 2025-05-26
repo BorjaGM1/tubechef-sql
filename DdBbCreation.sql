@@ -1320,8 +1320,8 @@ ALTER TABLE users
     ADD COLUMN rewardful_referral_id   VARCHAR(50),          -- Visitor-level UUID from Rewardful
     ADD COLUMN referral_captured_at    TIMESTAMP;            -- First time we stored the referral ID
 
-CREATE TABLE "DataProtectionKeys" (
-                                      "Id" SERIAL PRIMARY KEY,
-                                      "FriendlyName" TEXT NULL,
-                                      "Xml" TEXT NULL
+CREATE TABLE DataProtectionKeys (
+                                    Id SERIAL PRIMARY KEY,
+                                    FriendlyName TEXT NULL,
+                                    Xml TEXT NULL
 );
