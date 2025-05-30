@@ -1325,3 +1325,46 @@ CREATE TABLE DataProtectionKeys (
                                     FriendlyName TEXT NULL,
                                     Xml TEXT NULL
 );
+
+-- 1) Create (or replace) the trigger function
+CREATE OR REPLACE FUNCTION trg_user_role_change()
+    RETURNS TRIGGER
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Only act if role_id truly changed
+    IF NEW.role_id IS DISTINCT FROM OLD.role_id THEN
+
+        -- Case: upgrading to VIP (6) or Lifetime (7)
+        IF NEW.role_id IN (6, 7) THEN
+            -- only bump if below 2
+            IF NEW.license_limit < 2 THEN
+                NEW.license_limit := 2;
+            END IF;
+
+            -- Case: any other role
+        ELSE
+            -- remove all seats
+            NEW.license_limit := 0;
+
+            -- and clear device binding on all that user's API keys
+            UPDATE api_keys
+            SET device_id        = NULL
+              , device_registered = NULL
+            WHERE user_id = NEW.user_id;
+        END IF;
+
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+-- 2) Attach it as a BEFORE UPDATE trigger on users
+DROP TRIGGER IF EXISTS user_role_change ON users;
+CREATE TRIGGER user_role_change
+    BEFORE UPDATE
+    ON users
+    FOR EACH ROW
+    WHEN (OLD.role_id IS DISTINCT FROM NEW.role_id)
+EXECUTE PROCEDURE trg_user_role_change();
