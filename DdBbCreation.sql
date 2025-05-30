@@ -1368,3 +1368,25 @@ CREATE TRIGGER user_role_change
     FOR EACH ROW
     WHEN (OLD.role_id IS DISTINCT FROM NEW.role_id)
 EXECUTE PROCEDURE trg_user_role_change();
+
+/* ----------------------------------------------------------
+   Discord integration – store both fields as plain text
+   ----------------------------------------------------------*/
+BEGIN;
+
+-- 1) Add the columns (nullable while you back-fill)
+ALTER TABLE users
+    ADD COLUMN discord_id   VARCHAR(64),   -- ID as a string (Snowflake or other)
+    ADD COLUMN discord_name VARCHAR(100);  -- e.g. "MyUser#1234"
+
+-- 2) One Discord account → one user
+CREATE UNIQUE INDEX IF NOT EXISTS users_discord_id_unique
+    ON users(discord_id)
+    WHERE discord_id IS NOT NULL;
+
+-- 3) Handy look-up on nickname (case-insensitive)
+CREATE INDEX IF NOT EXISTS idx_users_discord_name_ci
+    ON users (lower(discord_name));
+
+COMMIT;
+
